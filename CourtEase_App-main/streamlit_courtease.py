@@ -219,11 +219,11 @@ elif menu == "Booking":
 elif menu == "Data Booking":
     st.header("📄 Data Booking")
 
-    db.db.c.execute("""
+    db.c.execute("""
         SELECT id, field_name, date, start_time, duration 
         FROM Booking
     """)
-    rows = db.db.c.fetchall()
+    rows = db.c.fetchall()
 
     if not rows:
         st.info("Belum ada booking.")
@@ -241,6 +241,6 @@ elif menu == "Data Booking":
             """)
 
             if st.button(f"Hapus Booking {b[0]}"):
-                db.db.c.execute("DELETE FROM Booking WHERE id=?", (b[0],))
-                db.db.conn.commit()
+                db.c.execute("DELETE FROM Booking WHERE id=?", (b[0],))
+                db.conn.commit()
                 st.experimental_rerun()
