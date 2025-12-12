@@ -175,7 +175,7 @@ elif menu == "Kelola Lapangan":
     st.header("🛠 Kelola Lapangan")
 
     name = st.text_input("Nama Lapangan")
-    type = st.selectbox("Jenis", ["Futsal", "Badminton", "Basket", "Mini Soccer"])
+    type = st.selectbox("Jenis", ["Futsal", "Badminton", "Basket", "Mini Soccer", "Padel", "Tennis", "Voli"])
     price = st.number_input("Harga / Jam", min_value=0.0)
 
     if st.button("Tambah"):
@@ -244,3 +244,4 @@ elif menu == "Data Booking":
                 db.c.execute("DELETE FROM Booking WHERE id=?", (b[0],))
                 db.conn.commit()
                 st.experimental_rerun()
+
