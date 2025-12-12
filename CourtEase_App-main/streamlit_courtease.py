@@ -201,7 +201,13 @@ elif menu == "Data Booking":
     else:
         for b in rows:
             field = field_repo.get_by_name(b[1])
+
+            if field is None:
+                st.error(f"Lapangan '{b[1]}' tidak ditemukan (mungkin sudah dihapus).")
+                continue
+
             total = field.get_price() * b[4]
+
 
             st.write(f"""
                 **Lapangan:** {b[1]}  
@@ -215,6 +221,7 @@ elif menu == "Data Booking":
                 db.c.execute("DELETE FROM Booking WHERE id=?", (b[0],))
                 db.conn.commit()
                 st.experimental_rerun()
+
 
 
 
