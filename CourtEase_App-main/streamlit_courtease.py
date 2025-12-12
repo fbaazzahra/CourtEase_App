@@ -1,7 +1,23 @@
 import streamlit as st
 import sqlite3
 
+# ============================================
+#                 DATA AWAL (DICTIONARY)
+# ============================================
+default_fields = [
+    {"name": "Futsal Primavera Wiyung", "type": "Futsal", "price": 125000},
+    {"name": "GOR Suryanaga", "type": "Badminton", "price": 70000},
+    {"name": "Wonderkid Basketball Indoor Court", "type": "Basket", "price": 175000},
+    {"name": "Pista Padel Club", "type": "Padel", "price": 339000},
+    {"name": "Metro Margomulyo Tennis Indoor", "type": "Tennis", "price": 150000},
+    {"name": "Delano Sport", "type": "Voli", "price": 150000},
+    {"name": "Surabaya Mini Soccer", "type": "Mini Soccer", "price": 200000},
+]
+
+
+# ============================================
 #                 DATABASE CONNECTION
+# ============================================
 class Database:
     def __init__(self, db_name="courtease.db"):
         self.conn = sqlite3.connect(db_name, check_same_thread=False)
@@ -28,7 +44,9 @@ class Database:
         self.conn.commit()
 
 
-#                        FIELD
+# ============================================
+#                     FIELD
+# ============================================
 class Field:
     def __init__(self, name, type, price_per_hour):
         self._name = name
@@ -45,15 +63,20 @@ class Field:
         return self._price_per_hour
 
 
-#                   FIELD REPOSITORY
+# ============================================
+#              FIELD REPOSITORY
+# ============================================
 class FieldRepository:
     def __init__(self, db: Database):
         self.db = db
 
     def create_field(self, name, type, price):
         q = "INSERT INTO Field (name, type, price) VALUES (?, ?, ?)"
-        self.db.c.execute(q, (name, type, price))
-        self.db.conn.commit()
+        try:
+            self.db.c.execute(q, (name, type, price))
+            self.db.conn.commit()
+        except:
+            pass  # Jika duplikat, lewati
 
     def get_all(self):
         self.db.c.execute("SELECT name, type, price FROM Field")
@@ -69,8 +92,20 @@ class FieldRepository:
         row = self.db.c.fetchone()
         return Field(row[0], row[1], row[2]) if row else None
 
+    # ================ SEED DATA DICTIONARY KE DATABASE ================
+    def seed_default_fields(self):
+        self.db.c.execute("SELECT COUNT(*) FROM Field")
+        count = self.db.c.fetchone()[0]
 
-#                        BOOKING
+        # IF–ELSE + LOOP + LIST + DICTIONARY
+        if count == 0:  # kalau database masih kosong
+            for f in default_fields:  # loop melalui list of dict
+                self.create_field(f["name"], f["type"], f["price"])
+
+
+# ============================================
+#                     BOOKING
+# ============================================
 class Booking:
     def __init__(self, field: Field, date, start_time, duration):
         self.field = field
@@ -91,7 +126,9 @@ class Booking:
         return self._duration * self.field.get_price()
 
 
-#                  BOOKING REPOSITORY
+# ============================================
+#              BOOKING REPOSITORY
+# ============================================
 class BookingRepository:
     def __init__(self, db: Database, field_repo: FieldRepository):
         self.db = db
@@ -123,9 +160,12 @@ class BookingRepository:
         self.db.conn.commit()
 
 
-#                     STREAMLIT APP
+# ============================================
+#                STREAMLIT APP
+# ============================================
 db = Database()
 field_repo = FieldRepository(db)
+field_repo.seed_default_fields()  # ← INPUT DICTIONARY KE DATABASE
 booking_repo = BookingRepository(db, field_repo)
 
 st.title("🏟 CourtEase — Booking Lapangan (OOP Version)")
@@ -133,7 +173,9 @@ st.title("🏟 CourtEase — Booking Lapangan (OOP Version)")
 menu = st.sidebar.radio("Menu", ["Home", "Kelola Lapangan", "Booking", "Data Booking"])
 
 
-#                         HOME
+# ============================================
+#                     HOME
+# ============================================
 if menu == "Home":
     st.header("Selamat datang di CourtEase 👋")
 
@@ -145,7 +187,9 @@ if menu == "Home":
             st.write(f"**{f.get_name()}** — {f.get_type()} — Rp{f.get_price():,.0f}/jam")
 
 
-#                    KELOLA LAPANGAN
+# ============================================
+#              KELOLA LAPANGAN
+# ============================================
 elif menu == "Kelola Lapangan":
     st.header("🛠 Kelola Lapangan")
 
@@ -166,7 +210,9 @@ elif menu == "Kelola Lapangan":
             st.experimental_rerun()
 
 
-#                        BOOKING
+# ============================================
+#                     BOOKING
+# ============================================
 elif menu == "Booking":
     st.header("📅 Booking Lapangan")
 
@@ -186,14 +232,13 @@ elif menu == "Booking":
             st.success("Booking berhasil!")
 
 
-#                     DATA BOOKING
+# ============================================
+#                 DATA BOOKING
+# ============================================
 elif menu == "Data Booking":
     st.header("📄 Data Booking")
 
-    db.c.execute("""
-        SELECT id, field_name, date, start_time, duration 
-        FROM Booking
-    """)
+    db.c.execute("SELECT id, field_name, date, start_time, duration FROM Booking")
     rows = db.c.fetchall()
 
     if not rows:
@@ -208,7 +253,6 @@ elif menu == "Data Booking":
 
             total = field.get_price() * b[4]
 
-
             st.write(f"""
                 **Lapangan:** {b[1]}  
                 **Tanggal:** {b[2]}  
@@ -218,11 +262,5 @@ elif menu == "Data Booking":
             """)
 
             if st.button(f"Hapus Booking {b[0]}"):
-                db.c.execute("DELETE FROM Booking WHERE id=?", (b[0],))
-                db.conn.commit()
+                booking_repo.delete_booking(b[0])
                 st.experimental_rerun()
-
-
-
-
-
