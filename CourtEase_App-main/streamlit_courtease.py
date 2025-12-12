@@ -1,9 +1,7 @@
 import streamlit as st
 import sqlite3
 
-# =======================================================
 #                 DATABASE CONNECTION
-# =======================================================
 class Database:
     def __init__(self, db_name="courtease.db"):
         self.conn = sqlite3.connect(db_name, check_same_thread=False)
@@ -30,9 +28,7 @@ class Database:
         self.conn.commit()
 
 
-# =======================================================
 #                        FIELD
-# =======================================================
 class Field:
     def __init__(self, name, type, price_per_hour):
         self._name = name
@@ -49,9 +45,7 @@ class Field:
         return self._price_per_hour
 
 
-# =======================================================
 #                   FIELD REPOSITORY
-# =======================================================
 class FieldRepository:
     def __init__(self, db: Database):
         self.db = db
@@ -71,9 +65,7 @@ class FieldRepository:
         self.db.conn.commit()
 
 
-# =======================================================
 #                        BOOKING
-# =======================================================
 class Booking:
     def __init__(self, field: Field, date, start_time, duration):
         self.field = field
@@ -94,9 +86,7 @@ class Booking:
         return self._duration * self.field.get_price()
 
 
-# =======================================================
 #                  BOOKING REPOSITORY
-# =======================================================
 class BookingRepository:
     def __init__(self, db: Database, field_repo: FieldRepository):
         self.db = db
@@ -142,9 +132,7 @@ def field_repo_get_by_name(self, name):
 FieldRepository.get_by_name = field_repo_get_by_name
 
 
-# =======================================================
 #                     STREAMLIT APP
-# =======================================================
 db = Database()
 field_repo = FieldRepository(db)
 booking_repo = BookingRepository(db, field_repo)
@@ -154,9 +142,7 @@ st.title("🏟 CourtEase — Booking Lapangan (OOP Version)")
 menu = st.sidebar.radio("Menu", ["Home", "Kelola Lapangan", "Booking", "Data Booking"])
 
 
-# =======================================================
 #                         HOME
-# =======================================================
 if menu == "Home":
     st.header("Selamat datang di CourtEase 👋")
 
@@ -168,9 +154,7 @@ if menu == "Home":
             st.write(f"**{f.get_name()}** — {f.get_type()} — Rp{f.get_price():,.0f}/jam")
 
 
-# =======================================================
 #                    KELOLA LAPANGAN
-# =======================================================
 elif menu == "Kelola Lapangan":
     st.header("🛠 Kelola Lapangan")
 
@@ -191,9 +175,7 @@ elif menu == "Kelola Lapangan":
             st.experimental_rerun()
 
 
-# =======================================================
 #                        BOOKING
-# =======================================================
 elif menu == "Booking":
     st.header("📅 Booking Lapangan")
 
@@ -213,9 +195,7 @@ elif menu == "Booking":
             st.success("Booking berhasil!")
 
 
-# =======================================================
 #                     DATA BOOKING
-# =======================================================
 elif menu == "Data Booking":
     st.header("📄 Data Booking")
 
@@ -244,4 +224,5 @@ elif menu == "Data Booking":
                 db.c.execute("DELETE FROM Booking WHERE id=?", (b[0],))
                 db.conn.commit()
                 st.experimental_rerun()
+
 
