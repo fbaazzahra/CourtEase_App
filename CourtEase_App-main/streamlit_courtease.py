@@ -123,15 +123,6 @@ class BookingRepository:
         self.db.conn.commit()
 
 
-# Tambahan method kecil agar tidak error
-def field_repo_get_by_name(self, name):
-    self.db.c.execute("SELECT name, type, price FROM Field WHERE name=?", (name,))
-    row = self.db.c.fetchone()
-    return Field(row[0], row[1], row[2]) if row else None
-
-FieldRepository.get_by_name = field_repo_get_by_name
-
-
 #                     STREAMLIT APP
 db = Database()
 field_repo = FieldRepository(db)
@@ -224,6 +215,7 @@ elif menu == "Data Booking":
                 db.c.execute("DELETE FROM Booking WHERE id=?", (b[0],))
                 db.conn.commit()
                 st.experimental_rerun()
+
 
 
 
