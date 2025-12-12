@@ -68,7 +68,7 @@ class FieldRepository:
             self.db.c.execute(q, (name, type, price))
             self.db.conn.commit()
         except:
-            pass  # Jika duplikat, lewati
+            pass 
 
     def get_all(self):
         self.db.c.execute("SELECT name, type, price FROM Field")
@@ -89,9 +89,8 @@ class FieldRepository:
         self.db.c.execute("SELECT COUNT(*) FROM Field")
         count = self.db.c.fetchone()[0]
 
-        # IF–ELSE + LOOP + LIST + DICTIONARY
-        if count == 0:  # kalau database masih kosong
-            for f in default_fields:  # loop melalui list of dict
+        if count == 0:
+            for f in default_fields:
                 self.create_field(f["name"], f["type"], f["price"])
 
 
@@ -151,7 +150,7 @@ class BookingRepository:
 #                STREAMLIT APP
 db = Database()
 field_repo = FieldRepository(db)
-field_repo.seed_default_fields()  # ← INPUT DICTIONARY KE DATABASE
+field_repo.seed_default_fields() 
 booking_repo = BookingRepository(db, field_repo)
 
 st.title("🏟 CourtEase — Booking Lapangan (OOP Version)")
@@ -242,3 +241,4 @@ elif menu == "Data Booking":
             if st.button(f"Hapus Booking {b[0]}"):
                 booking_repo.delete_booking(b[0])
                 st.experimental_rerun()
+
