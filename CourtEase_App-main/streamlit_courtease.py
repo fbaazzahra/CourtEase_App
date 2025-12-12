@@ -64,6 +64,11 @@ class FieldRepository:
         self.db.c.execute("DELETE FROM Field WHERE name=?", (name,))
         self.db.conn.commit()
 
+    def get_by_name(self, name):
+        self.db.c.execute("SELECT name, type, price FROM Field WHERE name=?", (name,))
+        row = self.db.c.fetchone()
+        return Field(row[0], row[1], row[2]) if row else None
+
 
 #                        BOOKING
 class Booking:
@@ -116,11 +121,6 @@ class BookingRepository:
     def delete_booking(self, id):
         self.db.c.execute("DELETE FROM Booking WHERE id=?", (id,))
         self.db.conn.commit()
-
-    def get_by_name(self, name):
-        self.db.c.execute("SELECT name, type, price FROM Field WHERE name=?", (name,))
-        row = self.db.c.fetchone()
-        return Field(row[0], row[1], row[2]) if row else None
 
 
 # Tambahan method kecil agar tidak error
@@ -224,5 +224,6 @@ elif menu == "Data Booking":
                 db.c.execute("DELETE FROM Booking WHERE id=?", (b[0],))
                 db.conn.commit()
                 st.experimental_rerun()
+
 
 
