@@ -1,9 +1,7 @@
 import streamlit as st
 import sqlite3
 
-# ============================================
 #                 DATA AWAL (DICTIONARY)
-# ============================================
 default_fields = [
     {"name": "Futsal Primavera Wiyung", "type": "Futsal", "price": 125000},
     {"name": "GOR Suryanaga", "type": "Badminton", "price": 70000},
@@ -15,9 +13,7 @@ default_fields = [
 ]
 
 
-# ============================================
 #                 DATABASE CONNECTION
-# ============================================
 class Database:
     def __init__(self, db_name="courtease.db"):
         self.conn = sqlite3.connect(db_name, check_same_thread=False)
@@ -44,9 +40,7 @@ class Database:
         self.conn.commit()
 
 
-# ============================================
 #                     FIELD
-# ============================================
 class Field:
     def __init__(self, name, type, price_per_hour):
         self._name = name
@@ -63,9 +57,7 @@ class Field:
         return self._price_per_hour
 
 
-# ============================================
 #              FIELD REPOSITORY
-# ============================================
 class FieldRepository:
     def __init__(self, db: Database):
         self.db = db
@@ -103,9 +95,7 @@ class FieldRepository:
                 self.create_field(f["name"], f["type"], f["price"])
 
 
-# ============================================
 #                     BOOKING
-# ============================================
 class Booking:
     def __init__(self, field: Field, date, start_time, duration):
         self.field = field
@@ -126,9 +116,7 @@ class Booking:
         return self._duration * self.field.get_price()
 
 
-# ============================================
 #              BOOKING REPOSITORY
-# ============================================
 class BookingRepository:
     def __init__(self, db: Database, field_repo: FieldRepository):
         self.db = db
@@ -160,9 +148,7 @@ class BookingRepository:
         self.db.conn.commit()
 
 
-# ============================================
 #                STREAMLIT APP
-# ============================================
 db = Database()
 field_repo = FieldRepository(db)
 field_repo.seed_default_fields()  # ← INPUT DICTIONARY KE DATABASE
@@ -173,9 +159,7 @@ st.title("🏟 CourtEase — Booking Lapangan (OOP Version)")
 menu = st.sidebar.radio("Menu", ["Home", "Kelola Lapangan", "Booking", "Data Booking"])
 
 
-# ============================================
 #                     HOME
-# ============================================
 if menu == "Home":
     st.header("Selamat datang di CourtEase 👋")
 
@@ -187,9 +171,7 @@ if menu == "Home":
             st.write(f"**{f.get_name()}** — {f.get_type()} — Rp{f.get_price():,.0f}/jam")
 
 
-# ============================================
 #              KELOLA LAPANGAN
-# ============================================
 elif menu == "Kelola Lapangan":
     st.header("🛠 Kelola Lapangan")
 
@@ -210,9 +192,7 @@ elif menu == "Kelola Lapangan":
             st.experimental_rerun()
 
 
-# ============================================
 #                     BOOKING
-# ============================================
 elif menu == "Booking":
     st.header("📅 Booking Lapangan")
 
@@ -232,9 +212,7 @@ elif menu == "Booking":
             st.success("Booking berhasil!")
 
 
-# ============================================
 #                 DATA BOOKING
-# ============================================
 elif menu == "Data Booking":
     st.header("📄 Data Booking")
 
